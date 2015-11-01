@@ -32,14 +32,27 @@ void signal(sem_t *sem){
 
 void *read(void *args){
     thread_data *data = (thread_data *)args;
+    
     wait(&mutex);
-    
-    
+    readcount++;
+    if (readcount==1){
+        wait(&wrt);
+    }
+    signal(&mutex);
+    //reading
+    wait(&mutex);
+    readcount--;
+    if (readcount==0){
+        signal(&wrt);
+    }
     signal(&mutex);
 }
 
 void *write(void *args){
     thread_data *data = (thread_data *)args;
+    wait(&wrt);
+    //writing
+    signal(&wrt);
 }
 
 // Initializing the semaphores
