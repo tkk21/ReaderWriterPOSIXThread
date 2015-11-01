@@ -4,12 +4,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define NUM_THREADS 200
+
+
 typedef struct _thread_data_ {
     int tid;// thread's id
-    int readcount; // status of whether or not something was read or not
 } thread_data;
 
 sem_t mutex, wrt;
+int readcount=0; // status of whether or not something was read or not
 
 // Error checked syscall of semaphore wait
 void wait(sem_t *sem){
@@ -29,7 +32,10 @@ void signal(sem_t *sem){
 
 void *read(void *args){
     thread_data *data = (thread_data *)args;
-
+    wait(&mutex);
+    
+    
+    signal(&mutex);
 }
 
 void *write(void *args){
@@ -49,7 +55,10 @@ void initialize_semaphores(){
 }
 
 int main (){
+    pthread_t threads[NUM_THREADS];
+    thread_data thread_data_arr[NUM_THREADS];
+    
 
-
+    return 0;
 }
 
