@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define NUM_THREADS 200
-
+#define RAND_RANGE 100
 
 typedef struct _thread_data_ {
     int tid;// thread's id
@@ -13,7 +13,11 @@ typedef struct _thread_data_ {
 
 sem_t mutex, wrt;
 int readcount=0; // status of whether or not something was read or not
+time_t t;
 
+int getRand(){
+    return  ((rand() % RAND_RANGE) - RAND_RANGE/2);
+}
 // Error checked syscall of semaphore wait
 void wait(sem_t *sem){
     if(sem_wait(sem) < 0) {
@@ -30,6 +34,9 @@ void signal(sem_t *sem){
     }
 }
 
+void print(){
+
+}
 void *read(void *args){
     thread_data *data = (thread_data *)args;
     
