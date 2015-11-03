@@ -36,13 +36,13 @@ void signal(sem_t *sem){
 }
 
 
-void *read(void *args){
+void *reader(void *args){
     thread_data *data = (thread_data *)args;
     
     wait(&mutex);
     readcount++;
     fflush(stdout);
-    printf("Thread %d read \treadcount: %d", data->tid, readcount);
+    printf("Thread %d reader \treadcount: %d", data->tid, readcount);
     if (readcount==1){
         wait(&wrt);
     }
@@ -58,7 +58,7 @@ void *read(void *args){
     signal(&mutex);
 }
 
-void *write(void *args){
+void *writer(void *args){
     thread_data *data = (thread_data *)args;
     wait(&wrt);
     //writing
@@ -98,10 +98,10 @@ int main (int argc, char const *argv[]){
             thread_data_arr[i].tid = i; //set the id of the thread
             
             if (getRand()==0){//read
-                thread_function = read;
+                thread_function = reader;
             }
-            else{/write
-                thread_function = write;
+            else{//write
+                thread_function = writer;
             }
 
             //create the thread
