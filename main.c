@@ -114,7 +114,7 @@ int main (int argc, char const *argv[]){
         //join threads
 
         for (i=0; i<NUM_THREADS; i++){
-            if ((errorCheckThread = pthread_join(&threads[i], NULL))){
+            if ((errorCheckThread = pthread_join(threads[i], NULL))){
                 fprintf(stderr, "error: pthread_join, %d\n", errorCheckThread);
             }
         }
