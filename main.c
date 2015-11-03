@@ -20,7 +20,7 @@ int getRand(){
 }
 
 // Error checked syscall of semaphore wait
-void wait(sem_t *sem){
+void semwait(sem_t *sem){
     if(sem_wait(sem) < 0) {
         perror ("sem_wait");
         exit (EXIT_FAILURE);
@@ -28,7 +28,7 @@ void wait(sem_t *sem){
 }
 
 // Error checked syscall of semaphore signal
-void signal(sem_t *sem){
+void semsignal(sem_t *sem){
     if(sem_post(sem) < 0){
         perror ("sem_post");
         exit (EXIT_FAILURE);
@@ -39,30 +39,30 @@ void signal(sem_t *sem){
 void *reader(void *args){
     thread_data *data = (thread_data *)args;
     
-    wait(&mutex);
+    semwait(&mutex);
     readcount++;
     fflush(stdout);
     printf("Thread %d reader \treadcount: %d", data->tid, readcount);
     if (readcount==1){
-        wait(&wrt);
+        semwait(&wrt);
     }
     printf("Thread %d releases", data->tid);
     fflush(stdout);
-    signal(&mutex);
+    semsignal(&mutex);
     //reading
-    wait(&mutex);
+    semwait(&mutex);
     readcount--;
     if (readcount==0){
-        signal(&wrt);
+        semsignal(&wrt);
     }
-    signal(&mutex);
+    semsignal(&mutex);
 }
 
 void *writer(void *args){
     thread_data *data = (thread_data *)args;
-    wait(&wrt);
+    semwait(&wrt);
     //writing
-    signal(&wrt);
+    semsignal(&wrt);
 }
 
 // Initializing the semaphores
@@ -88,7 +88,9 @@ int main (int argc, char const *argv[]){
     
     initialize_semaphores();
     if (debug){
-        printf("debug)");
+        printf("debug mode\n");
+        printf("using preset threads and operations\n");
+
     }
     else{
         int i;
