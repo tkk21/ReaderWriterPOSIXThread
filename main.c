@@ -12,6 +12,8 @@ typedef struct _thread_data_ {
 } thread_data;
 sem_t mutex, wrt;
 int readcount=0; // status of whether or not something was read or not
+int reader_remaining=0;
+int writer_remaining=0;
 time_t t;
 
 int getRand(){
@@ -43,7 +45,7 @@ void *reader(void *args){
     fflush(stdout);
     printf("[Thread %d] reads \treadcount: %d\n", data->tid, readcount);
     if (readcount==1){
-        printf("[Thread %d] reader waits for the writer\n", data->tid);
+        printf("[Thread %d] reader waits the wrt\n", data->tid);
         fflush(stdout);
         semwait(&wrt);
     }
@@ -62,6 +64,8 @@ void *reader(void *args){
         semsignal(&wrt);
     }
     printf("[Thread %d] reader releases the mutex\n", data->tid);
+    reader_remaining--;
+    printf("[Thread %d] reader_remaining: %d\n", data->tid, reader_remaining);
     fflush(stdout);
     semsignal(&mutex);
 }
@@ -75,6 +79,8 @@ void *writer(void *args){
     //writing
     fflush(stdout);
     printf("[Thread %d] writer is done writing and signals wrt\n", data->tid);
+    writer_remaining--;
+    printf("[Thread %d] writer_remaining: %d\n", data->tid,  writer_remaining);
     fflush(stdout);
     semsignal(&wrt);
 }
@@ -115,10 +121,14 @@ int main (int argc, char const *argv[]){
             if (getRand()==0){//read
                 thread_function = reader;
                 printf("[Thread %d] is declared as a Reader\n", i);
+                reader_remaining++;
+                printf("[Thread %d] reader_remaining: %d\n", i, reader_remaining);
             }
             else{//write
                 thread_function = writer;
                 printf("[Thread %d] is declared as a Writer\n", i);
+                writer_remaining++;
+                printf("[Thread %d] writer_remaining: %d\n", i, writer_remaining);
             }
 
             //create the thread
