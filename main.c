@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define NUM_THREADS 10
+#define NUM_THREADS 100
 #define RAND_RANGE 2
 
 typedef struct _thread_data_ {
@@ -43,7 +43,7 @@ void *reader(void *args){
     semwait(&mutex);
     readcount++;
     fflush(stdout);
-    printf("[Thread %d] reads \treadcount: %d\n", data->tid, readcount);
+    printf("[Thread %d] before reading \treadcount: %d\n", data->tid, readcount);
     if (readcount==1){
         printf("[Thread %d] reader waits the wrt\n", data->tid);
         fflush(stdout);
@@ -54,10 +54,11 @@ void *reader(void *args){
     fflush(stdout);
     semsignal(&mutex);
     //reading
+    printf("[Thread %d] is reading\n", data->tid);
     semwait(&mutex);
     readcount--;
     fflush(stdout);
-    printf("[Thread %d] read \t readcount: %d\n", data->tid, readcount);
+    printf("[Thread %d] after reading \t readcount: %d\n", data->tid, readcount);
     if (readcount==0){
         printf("[Thread %d] reader signals wrt\n", data->tid);
         fflush(stdout);
@@ -77,6 +78,7 @@ void *writer(void *args){
     fflush(stdout);
     semwait(&wrt);
     //writing
+    printf("[Thread %d] is writing\n", data->tid);
     fflush(stdout);
     printf("[Thread %d] writer is done writing and signals wrt\n", data->tid);
     writer_remaining--;
