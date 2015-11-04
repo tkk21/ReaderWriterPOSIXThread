@@ -44,6 +44,7 @@ void *reader(void *args){
     printf("[Thread %d] reads \treadcount: %d\n", data->tid, readcount);
     if (readcount==1){
         printf("[Thread %d] reader waits for the writer\n", data->tid);
+        fflush();
         semwait(&wrt);
     }
     fflush(stdout);
@@ -54,20 +55,27 @@ void *reader(void *args){
     semwait(&mutex);
     readcount--;
     fflush(stdout);
-    printf("[Thread %d] done reading \t readcount: %d\n", data->tid, readcount);
+    printf("[Thread %d] read \t readcount: %d\n", data->tid, readcount);
     if (readcount==0){
-        printf("[Thread %d] signals the writer\n", data->tid);
+        printf("[Thread %d] reader signals wrt\n", data->tid);
+        fflush();
         semsignal(&wrt);
     }
-    printf("[Thread %d] releases the mutex\n", data->tid);
+    printf("[Thread %d] reader releases the mutex\n", data->tid);
     fflush(stdout);
     semsignal(&mutex);
 }
 
 void *writer(void *args){
     thread_data *data = (thread_data *)args;
+    fflush();
+    printf("[Thread %d] writer waits for the reader\n", data->tid);
+    fflush();
     semwait(&wrt);
     //writing
+    fflush();
+    printf("[Thread %d] writer is done writing and signals wrt\n", data->tid);
+    fflush();
     semsignal(&wrt);
 }
 
@@ -102,7 +110,6 @@ int main (int argc, char const *argv[]){
         int i;
         for (i = 0; i<NUM_THREADS; i++){
             void *thread_function;//pointer to the thread to call
-            
             thread_data_arr[i].tid = i; //set the id of the thread
             
             if (getRand()==0){//read
@@ -122,7 +129,6 @@ int main (int argc, char const *argv[]){
         }
 
         //join threads
-
         for (i=0; i<NUM_THREADS; i++){
             if ((errorCheckThread = pthread_join(threads[i], NULL))){
                 fprintf(stderr, "error: pthread_join, %d\n", errorCheckThread);
@@ -131,4 +137,3 @@ int main (int argc, char const *argv[]){
     }
     return 0;
 }
-
