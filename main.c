@@ -107,9 +107,11 @@ int main (int argc, char const *argv[]){
             
             if (getRand()==0){//read
                 thread_function = reader;
+                printf("[Thread %d] is declared as a Reader\n", i);
             }
             else{//write
                 thread_function = writer;
+                printf("[Thread %d] is declared as a Writer\n", i);
             }
 
             //create the thread
