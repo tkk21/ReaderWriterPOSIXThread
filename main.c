@@ -10,7 +10,6 @@
 typedef struct _thread_data_ {
     int tid;// thread's id
 } thread_data;
-
 sem_t mutex, wrt;
 int readcount=0; // status of whether or not something was read or not
 time_t t;
@@ -42,19 +41,26 @@ void *reader(void *args){
     semwait(&mutex);
     readcount++;
     fflush(stdout);
-    printf("Thread %d reader \treadcount: %d", data->tid, readcount);
+    printf("[Thread %d] reads \treadcount: %d\n", data->tid, readcount);
     if (readcount==1){
+        printf("[Thread %d] reader waits for the writer", data->tid);
         semwait(&wrt);
     }
-    printf("Thread %d releases", data->tid);
+    fflush(stdout);
+    printf("[Thread %d] releases the mutex\n", data->tid);
     fflush(stdout);
     semsignal(&mutex);
     //reading
     semwait(&mutex);
     readcount--;
+    fflush(stdout);
+    printf("[Thread %d] done reading \t readcount: %d\n", data->tid, readcount);
     if (readcount==0){
+        printf("[Thread %d] signals the writer\n", data->tid);
         semsignal(&wrt);
     }
+    printf("[Thread %d] releases the mutex\n", data->tid);
+    fflush(stdout);
     semsignal(&mutex);
 }
 
