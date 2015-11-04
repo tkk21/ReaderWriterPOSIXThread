@@ -44,7 +44,7 @@ void *reader(void *args){
     printf("[Thread %d] reads \treadcount: %d\n", data->tid, readcount);
     if (readcount==1){
         printf("[Thread %d] reader waits for the writer\n", data->tid);
-        fflush();
+        fflush(stdout);
         semwait(&wrt);
     }
     fflush(stdout);
@@ -58,7 +58,7 @@ void *reader(void *args){
     printf("[Thread %d] read \t readcount: %d\n", data->tid, readcount);
     if (readcount==0){
         printf("[Thread %d] reader signals wrt\n", data->tid);
-        fflush();
+        fflush(stdout);
         semsignal(&wrt);
     }
     printf("[Thread %d] reader releases the mutex\n", data->tid);
@@ -68,14 +68,14 @@ void *reader(void *args){
 
 void *writer(void *args){
     thread_data *data = (thread_data *)args;
-    fflush();
+    fflush(stdout);
     printf("[Thread %d] writer waits for the reader\n", data->tid);
-    fflush();
+    fflush(stdout);
     semwait(&wrt);
     //writing
-    fflush();
+    fflush(stdout);
     printf("[Thread %d] writer is done writing and signals wrt\n", data->tid);
-    fflush();
+    fflush(stdout);
     semsignal(&wrt);
 }
 
